@@ -9,9 +9,7 @@
 
 using System;
 using System.Net.Http;
-using  System.Net.Http.Formatting;
 using System.Threading.Tasks;
-using Mandrill.Models;
 using Mandrill.Requests;
 using Mandrill.Utilities;
 
@@ -81,9 +79,9 @@ namespace Mandrill
       {
           using (var client = new HttpClient())
           {
-              var response = await client.PostAsJsonAsync(baseUrl + path, data);
+              var response = await client.PostAsJsonAsync(baseUrl + path, data).ConfigureAwait(false);
               response.EnsureSuccessStatusCode();
-              return await response.Content.ReadAsAsync<T>();
+              return await response.Content.ReadAsAsync<T>().ConfigureAwait(false);
           }
       }
       catch (TimeoutException ex)
