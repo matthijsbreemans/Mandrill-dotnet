@@ -9,9 +9,11 @@
 
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Mandrill.Requests;
 using Mandrill.Utilities;
+using Newtonsoft.Json;
 
 namespace Mandrill
 {
@@ -79,9 +81,15 @@ namespace Mandrill
       {
           using (var client = new HttpClient())
           {
-              var response = await client.PostAsJsonAsync(baseUrl + path, data).ConfigureAwait(false);
+              var response = await
+                  client.PostAsync(baseUrl + path,
+                      new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"))
+                      .ConfigureAwait(false);
+
               response.EnsureSuccessStatusCode();
-              return await response.Content.ReadAsAsync<T>().ConfigureAwait(false);
+
+              var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+              return await Task<T>.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(responseString)).ConfigureAwait(false);
           }
       }
       catch (TimeoutException ex)
