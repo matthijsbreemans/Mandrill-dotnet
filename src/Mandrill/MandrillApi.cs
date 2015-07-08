@@ -88,8 +88,7 @@ namespace Mandrill
 
               response.EnsureSuccessStatusCode();
 
-              var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-              return await Task<T>.Factory.StartNew(() => JsonConvert.DeserializeObject<T>(responseString)).ConfigureAwait(false);
+             return await response.Content.ReadAsStringAsync().ContinueWith<T>(r => JsonConvert.DeserializeObject<T>(r.Result)).ConfigureAwait(false);
           }
       }
       catch (TimeoutException ex)
